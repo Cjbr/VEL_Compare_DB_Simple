@@ -123,9 +123,15 @@ equipment_total = len(equipment)
 shared_total = int((equipment["project_count"] > 1).sum()) if equipment_total else 0
 specific_total = equipment_total - shared_total
 reuse_rate = shared_total / equipment_total * 100 if equipment_total else 0
-heavy_threshold = st.sidebar.slider(
-    "Heavy reuse threshold (projects)", 2, max(2, project_total), min(3, max(2, project_total))
-)
+if project_total > 2:
+    heavy_threshold = st.sidebar.slider(
+        "Heavy reuse threshold (projects)", 2, project_total, min(3, project_total)
+    )
+else:
+    # Streamlit sliders require the minimum to be smaller than the maximum.
+    # With two or fewer projects, 2 is the only meaningful reuse threshold.
+    heavy_threshold = 2
+    st.sidebar.caption("Heavy reuse threshold: 2 projects (more projects are needed to adjust it).")
 heavy_total = int((equipment["project_count"] >= heavy_threshold).sum()) if equipment_total else 0
 
 metric_columns = st.columns(5)
